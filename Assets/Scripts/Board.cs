@@ -60,6 +60,12 @@ public sealed class Board : MonoBehaviour
         if(_selection.Count < 2) return;
 
         await Swap(_selection[0], _selection[1]);
+
+        if(CanPop()) {
+            Pop();
+        } else {
+            await Swap(_selection[0], _selection[1]);
+        }
         
         // Debug.Log(_selection[0].x);
         // Debug.Log(_selection[0].y);
@@ -98,11 +104,49 @@ public sealed class Board : MonoBehaviour
 
     private bool CanPop() 
     {
-        throw new NotImplementedException();
+        for (var y = 0; y < Height; y++)
+        {
+            for (int x = 0; x < Width; x++)
+            {
+                if(Tiles[x, y].GetConnectedTiles().Skip(1).Count() >= 2){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
-    private void Pop() 
+    private async void Pop() 
     {
-        throw new NotImplementedException();
+        for (int y = 0; y < Height; y++)
+        {
+            for (int x = 0; x < Width; x++)
+            {
+                var tile = Tiles[x, y];
+                var connectedTiles = tile.GetConnectedTiles();
+
+                if (connectedTiles.Count < 2) continue;
+
+                var deflateSequence = DOTween.Sequence();
+
+                foreach (var connectedTile in connectedTiles)
+                {
+                    deflateSequence.Join(connectedTile.icon.transform.DOScale(Vector3.zero, TweenDuration));
+                }
+
+                await deflateSequence.Play().AsyncWaitForCompletion();
+                
+                var inflateSequence = DOTween.Sequence();
+
+                foreach (var connectedTile in connectedTiles)
+                {
+                    connectedTile.Item = ItemDatabase.Items[Random.Range(0, ItemDatabase.Items.Length)];
+
+                    inflateSequence.Join(connectedTile.icon.transform.DOScale(Vector3.one, TweenDuration));
+                }
+
+                await inflateSequence.Play().AsyncWaitForCompletion();
+            }
+        }
     }
 }
