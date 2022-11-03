@@ -46,6 +46,13 @@ public sealed class Board : MonoBehaviour
         }        
     }
 
+    private void Update()
+    {
+        if(!Input.GetKeyDown(KeyCode.A)) return;
+
+        foreach (var connectedTile in Tiles[0,0].GetConnectedTiles()) connectedTile.icon.transform.DOScale(1.25f, TweenDuration).Play();
+    }
+
     public async void Select(Tile tile)
     {
         if(!_selection.Contains(tile)) _selection.Add(tile);
@@ -54,10 +61,10 @@ public sealed class Board : MonoBehaviour
 
         await Swap(_selection[0], _selection[1]);
         
-        Debug.Log(_selection[0].x);
-        Debug.Log(_selection[0].y);
-        Debug.Log(_selection[1].x);
-        Debug.Log(_selection[1].y);
+        // Debug.Log(_selection[0].x);
+        // Debug.Log(_selection[0].y);
+        // Debug.Log(_selection[1].x);
+        // Debug.Log(_selection[1].y);
 
         _selection.Clear(); 
     }
@@ -87,6 +94,15 @@ public sealed class Board : MonoBehaviour
 
         tile1.Item = tile2.Item;
         tile2.Item = tile1Item;
+    }
 
+    private bool CanPop() 
+    {
+        throw new NotImplementedException();
+    }
+
+    private void Pop() 
+    {
+        throw new NotImplementedException();
     }
 }
